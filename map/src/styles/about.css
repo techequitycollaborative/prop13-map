@@ -1,0 +1,25 @@
+
+.card {
+    margin: 0 auto;
+    width: 60%;
+    max-width: 600px;
+    min-width: 300px;
+    text-align: center;
+    color: black;
+
+}
+
+.about {
+    margin: 0 auto;
+    height: 100%;
+    width: 100%;
+    color:black;
+}
+
+.answer {
+    list-style: outside none none;
+    display: inline-block;
+    color: black;
+    font-weight: bold;
+    font-size: 130%;
+}

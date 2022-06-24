@@ -1,0 +1,61 @@
+.case-study-page {
+    text-align: center;
+    font-family: sans-serif;
+    color: white;
+}
+
+.case-study {
+    text-align: center;
+    background-color: lightblue;
+    /*height: 48%;*/
+    /*width: 48%;*/
+    height: 440px;
+    width: 680px;
+    font-family: sans-serif;
+    padding: 10px;
+    /*margin: 10px;*/
+    color: white;
+    margin: 10px auto;
+    font-size: 20px;
+}
+
+.case-study-header {
+    font-weight: bold;
+    text-transform: uppercase;
+    background-color: lightblue;
+    margin: 5px;
+}
+
+.case-study-property {
+    background-color: white;
+    margin: 5px;
+    padding: 5px;
+    /*width: 80%;*/
+    flex: 1 1 0;
+    /*height: 90%;*/
+}
+
+.case-study-property-address {
+    background-color: cornflowerblue;
+    margin: 5px;
+    padding: 5px;
+}
+
+.case-study-properties {
+    display: flex;
+    justify-content: space-between;
+    flex: 1 1 0px;
+}
+
+.image {
+    height: 230px;
+    width: 320px;
+    overflow: hidden;
+}
+
+.image-credit {
+    color: cornflowerblue;
+    font-size: smaller;
+    margin-top: 5px;
+
+}

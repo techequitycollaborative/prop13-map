@@ -1,0 +1,78 @@
+.block {
+    background-color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
+  }
+
+.App-logo {
+    height: 40vmin;
+    pointer-events: none;
+  }
+
+    .header {
+      color: black;
+      margin-left: 25vw;
+      border: 2px solid black;
+      display: inline-block;
+    }
+
+    .map {
+      position: relative;
+      margin: 0;
+      height: 100vh;
+      width: '100%';
+      justify-content: center;
+  }
+  
+  .map-container {
+      position: relative;
+      height: inherit;
+      width: inherit;
+      margin-bottom: 20px;
+  }
+
+.marker {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.red {
+    background: red;
+}
+
+.cluster-marker {
+    color: #fff;
+    background: #1978c8;
+    border-radius: 50%;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.crime-marker {
+    background: none;
+    border: none;
+}
+
+.crime-marker img {
+    width: 25px;
+}
+
+.green {
+    background: green;
+}
+.mapboxgl-popup {
+    max-width: 200px;
+}
+.mapboxgl-popup-content {
+    text-align: center;
+    font-family: 'Open Sans', sans-serif;
+}

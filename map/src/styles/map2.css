@@ -1,0 +1,11 @@
+body {
+    padding: 0;
+    margin:0;
+}
+
+.header {
+    color: black;
+    margin-left: 25vw;
+    border: 2px solid black;
+    display: inline-block;
+  }

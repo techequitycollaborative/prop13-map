@@ -1,0 +1,29 @@
+body {
+    font-family: sans-serif;
+    background-color: #fff;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: hidden;
+}
+
+a {
+    text-align: center;
+    color: #1FB264;
+    font-weight: bolder;
+    font-size: larger;
+}
+
+img {
+    max-height: 300px;
+    max-width: 300px;
+    margin: 10px auto;
+    padding: 10px;
+    transition: all .2s ease;
+}
+
+.center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }

@@ -1,0 +1,28 @@
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    width: 80%;
+    margin-left: 10vw;
+}
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    background-color: black;
+}
+
+li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+li a:hover {
+    background-color: #6b000e;
+    color: white !important;
+}

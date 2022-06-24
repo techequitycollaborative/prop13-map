@@ -1,0 +1,36 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "description": "PSQL-Express API to fetch county data",
+  "main": "server.js",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "concurrently": "^4.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.0.0",
+    "express": "^4.17.1",
+    "express-promise-router": "^3.0.3",
+    "mapbox-gl": "^2.7.1",
+    "nodemon": "^2.0.7",
+    "path": "^0.12.7",
+    "pg": "^8.0.3",
+    "react-map-gl": "^7.0.10"
+  },
+  "engines": {
+    "npm": "^6.4.1",
+    "node": "^16.13.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "nodemon server.js",
+    "client": "cd map && npm run dev",
+    "dev": "concurrently \"npm run start\" \"npm run client\"",
+    "build": "npm install && cd map && npm install && npm run buildncopy"
+  },
+  "keywords": [
+    "mapping",
+    "housing",
+    "la",
+    "county"
+  ]
+}
