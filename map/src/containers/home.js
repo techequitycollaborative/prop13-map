@@ -51,6 +51,19 @@ const Home = () => {
         };
     }
 
+    function getPropSize(sqft) {
+        let prop_size;
+        if (sqft <= 3000)
+            prop_size = 'small';
+        else if (sqft > 3000 && sqft <= 15000)
+            prop_size = 'medium';
+        else if (sqft > 15000 && sqft <= 100000)
+            prop_size = 'large';
+        else prop_size = 'huge';
+
+        return prop_size;
+    }
+
     useEffect(() => {
         async function getMarkers() {
             let data = await fetchMarkers();
@@ -204,7 +217,8 @@ const Home = () => {
                     const estimated_value = e.features[0].properties.estimated_value;
                     const subsidy = e.features[0].properties.subsidy_formatted;
                     const subsidy_sqft = e.features[0].properties.subsidy_sqft;
-                     
+                    const prop_size = getPropSize(parseInt(sqft));
+
                     // Ensure that if the map is zoomed out such that
                     // multiple copies of the feature are visible, the
                     // popup appears over the copy being pointed to.
@@ -213,10 +227,11 @@ const Home = () => {
                     }    
                     new mapboxgl.Popup()
                         .setLngLat(coordinates)
-                        .setHTML(`<p>Address: ${address}<br/>${sqft} sqft</p>
+                        .setHTML(`<p class='popup-address'>${address}</p>
+                                <p>Property size: ${sqft.toLocaleString('en-US')} sqft (${prop_size})</p>
                                 <p>Estimated value: ${estimated_value}</p>
                                 <p>Assessed value: ${recorded_value}</p>
-                                <p>Estimated subsidy: ${subsidy} (${subsidy_sqft}/sqft)</p>`)
+                                <p>Estimated subsidy: ${subsidy} / year</p>`)
                         .addTo(map);
                 });
                  

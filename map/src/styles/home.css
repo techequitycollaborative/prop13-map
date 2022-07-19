@@ -56,14 +56,11 @@
     justify-content: center;
     align-items: center;
 }
-
-.crime-marker {
-    background: none;
-    border: none;
+.mapboxgl-popup-content p {
+    text-align: left;
 }
-
-.crime-marker img {
-    width: 25px;
+.popup-address {
+    font-weight: bold;
 }
 
 .green {
