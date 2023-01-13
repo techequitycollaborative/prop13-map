@@ -3,11 +3,9 @@ set -e
 set -u
 
 # https://stackoverflow.com/questions/13227142/using-row-to-json-with-nested-joins
-SQL="select row_to_json(row) FROM (select *, ST_MakePoint(long::double precision, lat::double precision) as geometry from la_manual_est_table WHERE long <> '' and lat <> '') row;"
+# https://gis.stackexchange.com/questions/112057/sql-query-to-have-a-complete-geojson-feature-from-postgis 
+# SQL="select row_to_json(row) FROM (select *, ST_MakePoint(long::double precision, lat::double precision) as geometry from la_manual_est_table WHERE long <> '' and lat <> '') row;"
 psql -t $1 --o features.geojson << EOF
---select row_to_json(row) FROM (
---select *, ST_MakePoint(long::double precision, lat::double precision) as geometry from la_manual_est_fixed WHERE long <> '' and lat <> '') row;
--- https://gis.stackexchange.com/questions/112057/sql-query-to-have-a-complete-geojson-feature-from-postgis
 SELECT jsonb_build_object(
     'type',       'Feature',
     'id',         prop_id,
