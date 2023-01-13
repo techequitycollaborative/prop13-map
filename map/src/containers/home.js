@@ -1,15 +1,22 @@
 import React, {useState, useRef, useEffect} from 'react'
 import "../styles/main.css"
 import "../styles/home.css"
+import * as pmtiles from "pmtiles";
+
+
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
-import mapboxgl from "mapbox-gl";
-// import maplibre from "maplibre-gl"
+// import mapboxgl from "mapbox-gl";
+import maplibregl from "maplibre-gl"
+let protocol = new pmtiles.Protocol();
+maplibregl.addProtocol("pmtiles",protocol.tile);
+
+
 
 const server = process.env.REACT_APP_SERVER_URL;
 const fetchString = 'server/fetchMarkers';
-const token = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
-mapboxgl.accessToken = token;
+// const token = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
+// mapboxgl.accessToken = token;
 
 
 const Home = () => {
@@ -47,6 +54,7 @@ const Home = () => {
             id: 'clusters',
             type: 'circle',
             source: 'parcels',
+            'source-layer': 'prop13',
             // filter: ['has', 'point_count'],
             paint: {
                 // Use step expressions (https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions-step)
@@ -76,6 +84,7 @@ const Home = () => {
             id: 'cluster-count',
             type: 'symbol',
             source: 'parcels',
+            'source-layer': 'prop13',
             filter: ['has', 'point_count'],
             paint: {
                 'text-color': '#555'
@@ -96,6 +105,7 @@ const Home = () => {
             id: 'unclustered-point',
             type: 'circle',
             source: 'parcels',
+            'source-layer': 'prop13',
             filter: ['!', ['has', 'point_count']],
             paint: {
                 'circle-color': [
@@ -243,15 +253,14 @@ const Home = () => {
             console.log('get markers')
             let data = await fetchMarkers();
             await setMarkers(data);
-            mapRef.current.addSource('parcels', {
-                type: "geojson",
-                data: featureCollection(data),
-                cluster: true,
-                clusterMaxZoom: 13, // Max zoom to cluster points on
-                clusterRadius: 100, // Radius of each cluster when clustering points (defaults to 50)
-                clusterProperties: {'sum': ['+', ['get', 'subsidy']]}
-            })
-            initClusterLayers(mapRef.current)
+            // mapRef.current.addSource('parcels', {
+            //     type: "geojson",
+            //     data: featureCollection(data),
+            //     cluster: true,
+            //     clusterMaxZoom: 13, // Max zoom to cluster points on
+            //     clusterRadius: 100, // Radius of each cluster when clustering points (defaults to 50)
+            //     clusterProperties: {'sum': ['+', ['get', 'subsidy']]}
+            // })
             
         }
         const fetchMarkers = async () => {
@@ -275,33 +284,38 @@ const Home = () => {
                 return 
             }
 
-            mapRef.current  = new mapboxgl.Map({
-                container: mapContainer.current,
-                // See style options here: https://docs.mapbox.com/api/maps/#styles
-                style: 'mapbox://styles/mapbox/light-v10?optimize=true',
-                center: [-118.2437, 34.0522],
-                zoom: 13,
-            });
-
-            // mapRef.current = new maplibre.Map({
+            // mapRef.current  = new mapboxgl.Map({
             //     container: mapContainer.current,
             //     // See style options here: https://docs.mapbox.com/api/maps/#styles
-            //     // style: 'mapbox://styles/mapbox/light-v10?optimize=true',
-            //     style: 'https://demotiles.maplibre.org/style.json',
+            //     style: 'mapbox://styles/mapbox/light-v10?optimize=true',
             //     center: [-118.2437, 34.0522],
-            //     zoom: 10,
+            //     zoom: 13,
             // });
+
+            mapRef.current = new maplibregl.Map({
+                container: mapContainer.current,
+                // See style options here: https://docs.mapbox.com/api/maps/#styles
+                // style: 'mapbox://styles/mapbox/light-v10?optimize=true',
+                style: 'https://demotiles.maplibre.org/style.json',
+                center: [-118.2437, 34.0522],
+                zoom: 10,
+            });
 
             const map = mapRef.current;
             map.on('load', () => {
                 map.resize()
                 console.log("map loaded")
+                map.addSource("parcels", {
+                    "type":"vector",
+                    "url":"pmtiles://prop13.pmtiles"
+                })
+                initClusterLayers(map)
                 // setDataOrAddSourceJSON(mapRef, 'parcels');
                 // initClusterLayers(mapRef)
                 // Add a new source from our GeoJSON data and
             
             });
-            // map.addControl(new maplibre.NavigationControl(), 'top-right');
+            map.addControl(new maplibregl.NavigationControl(), 'top-right');
          
   
 
@@ -312,7 +326,7 @@ const Home = () => {
         // This makes it feel super slow, we want map to render before fetch is done
         // if (markers.features) {
 
-        getMarkers();
+        // getMarkers();
         renderMap();
         // }
     }, []);
