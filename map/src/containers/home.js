@@ -280,7 +280,7 @@ const Home = () => {
         getMarkers();
         renderMap();
         // }
-    });
+    }, []);
 
     return (
         <div className="home">
