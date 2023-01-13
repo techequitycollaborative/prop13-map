@@ -130,99 +130,103 @@ const Home = () => {
                 layers: ['clusters']
             });
             const clusterId = features[0].properties.cluster_id;
-            map.getSource('parcels').getClusterExpansionZoom(
-                clusterId,
-                (err, zoom) => {
-                    if (err) return;
-                    map.easeTo({
-                        center: features[0].geometry.coordinates,
-                        zoom: zoom+2
-                    });
-                }
-            );
+            map.easeTo({
+                center: features[0].geometry.coordinates,
+                zoom: map.getZoom() + 2,
+              });
+            // map.getSource('parcels').getClusterExpansionZoom(
+            //     clusterId,
+            //     (err, zoom) => {
+            //         if (err) return;
+            //         map.easeTo({
+            //             center: features[0].geometry.coordinates,
+            //             zoom: zoom+2
+            //         });
+            //     }
+            // );
         });
          
-        // // When a click event occurs on a feature in
-        // // the unclustered-point layer, open a popup at
-        // // the location of the feature, with
-        // // description HTML from its properties.
-        // map.on('click', 'unclustered-point', (e) => {
-        //     const coordinates = e.features[0].geometry.coordinates.slice();
-        //     const address = e.features[0].properties.address;
-        //     const sqft = e.features[0].properties.sqft;
-        //     const recorded_value = e.features[0].properties.recorded_value;
-        //     const estimated_value = e.features[0].properties.estimated_value;
-        //     const subsidy = e.features[0].properties.subsidy_formatted;
-        //     // const subsidy_sqft = e.features[0].properties.subsidy_sqft;
-        //     const prop_size = getPropSize(parseInt(sqft));
+        // When a click event occurs on a feature in
+        // the unclustered-point layer, open a popup at
+        // the location of the feature, with
+        // description HTML from its properties.
+        map.on('click', 'unclustered-point', (e) => {
+            const coordinates = e.features[0].geometry.coordinates.slice();
+            const address = e.features[0].properties.address;
+            const sqft = e.features[0].properties.sqft;
+            const recorded_value = e.features[0].properties.recorded_value;
+            const estimated_value = e.features[0].properties.estimated_value;
+            const subsidy = e.features[0].properties.subsidy_formatted;
+            // const subsidy_sqft = e.features[0].properties.subsidy_sqft;
+            const prop_size = getPropSize(parseInt(sqft));
 
-        //     // Ensure that if the map is zoomed out such that
-        //     // multiple copies of the feature are visible, the
-        //     // popup appears over the copy being pointed to.
-        //     while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-        //         coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-        //     }    
-        //     new maplibre.Popup()
-        //         .setLngLat(coordinates)
-        //         .setHTML(`<p class='popup-address'>${address}</p>
-        //                 <p>Property size: ${sqft.toLocaleString('en-US')} sqft (${prop_size})</p>
-        //                 <p>Estimated value: ${estimated_value}</p>
-        //                 <p>Assessed value: ${recorded_value}</p>
-        //                 <p>Estimated subsidy: ${subsidy} / year</p>`)
-        //         .addTo(map);
-        // });
+            // Ensure that if the map is zoomed out such that
+            // multiple copies of the feature are visible, the
+            // popup appears over the copy being pointed to.
+            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+            }    
+            new maplibregl.Popup()
+                .setLngLat(coordinates)
+                .setHTML(`<p class='popup-address'>${address}</p>
+                        <p>Property size: ${sqft.toLocaleString('en-US')} sqft (${prop_size})</p>
+                        <p>Estimated value: ${estimated_value}</p>
+                        <p>Assessed value: ${recorded_value}</p>
+                        <p>Estimated subsidy: ${subsidy} / year</p>`)
+                .addTo(map);
+        });
          
-        // map.on('mouseenter', 'clusters', () => {
-        //     map.getCanvas().style.cursor = 'pointer';
-        // });
-        // map.on('mouseleave', 'clusters', () => {
-        //     map.getCanvas().style.cursor = '';
-        // });
-        // map.on('mouseenter', 'unclustered-point', () => {
-        //     map.getCanvas().style.cursor = 'pointer';
-        // });
-        // map.on('mouseleave', 'unclustered-point', () => {
-        //     map.getCanvas().style.cursor = '';
-        // });
+        map.on('mouseenter', 'clusters', () => {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+        map.on('mouseleave', 'clusters', () => {
+            map.getCanvas().style.cursor = '';
+        });
+        map.on('mouseenter', 'unclustered-point', () => {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+        map.on('mouseleave', 'unclustered-point', () => {
+            map.getCanvas().style.cursor = '';
+        });
  
     }
 
-    function formatResponse(data) {
-        // console.log('formatResponse', data)
-        return {
-            "features": data['results'].map(item => {
-                const recorded_value = parseFloat(item.recorded_value.replace(/[$,]/g, '')); //TODO fix db to have this preformatted
-                const estimated_value = Math.round(parseFloat(item.estimated_value.replace(/[$,]/g, '')) / 1000) * 1000;
-                const subsidy_total = Math.max((estimated_value - recorded_value) / 100.0, 0); // Based on 1% property tax
-                const subsidy_sqft = subsidy_total / parseFloat(item.sqft);
-                var formatter = new Intl.NumberFormat('en-US', {
-                    style: 'currency',
-                    currency: 'USD',
-                    maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
-                });
+    // function formatResponse(data) {
+    //     // console.log('formatResponse', data)
+    //     return {
+    //         "features": data['results'].map(item => {
+    //             const recorded_value = parseFloat(item.recorded_value.replace(/[$,]/g, '')); //TODO fix db to have this preformatted
+    //             const estimated_value = Math.round(parseFloat(item.estimated_value.replace(/[$,]/g, '')) / 1000) * 1000;
+    //             const subsidy_total = Math.max((estimated_value - recorded_value) / 100.0, 0); // Based on 1% property tax
+    //             const subsidy_sqft = subsidy_total / parseFloat(item.sqft);
+    //             var formatter = new Intl.NumberFormat('en-US', {
+    //                 style: 'currency',
+    //                 currency: 'USD',
+    //                 maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
+    //             });
 
-                return {
-                    "type": "Feature",
-                    "geometry": {
-                        "type": "Point",
-                        "coordinates": [item.long, item.lat]
-                    },
-                    "properties": {
-                        "id": item.prop_id,
-                        "recorded_value": formatter.format(recorded_value), 
-                        "estimated_value": formatter.format(estimated_value),
-                        "subsidy": subsidy_total,
-                        "subsidy_formatted": formatter.format(subsidy_total),
-                        "subsidy_sqft": formatter.format(subsidy_sqft),
-                        "color": Math.min((subsidy_sqft / 5) * 255, 255),
-                        "zipcode": item.zipcode,
-                        "sqft": item.sqft,
-                        "address": item.address
-                    }
-                };
-            })
-        };
-    }
+    //             return {
+    //                 "type": "Feature",
+    //                 "geometry": {
+    //                     "type": "Point",
+    //                     "coordinates": [item.long, item.lat]
+    //                 },
+    //                 "properties": {
+    //                     "id": item.prop_id,
+    //                     "recorded_value": formatter.format(recorded_value), 
+    //                     "estimated_value": formatter.format(estimated_value),
+    //                     "subsidy": subsidy_total,
+    //                     "subsidy_formatted": formatter.format(subsidy_total),
+    //                     "subsidy_sqft": formatter.format(subsidy_sqft),
+    //                     "color": Math.min((subsidy_sqft / 5) * 255, 255),
+    //                     "zipcode": item.zipcode,
+    //                     "sqft": item.sqft,
+    //                     "address": item.address
+    //                 }
+    //             };
+    //         })
+    //     };
+    // }
 
     function getPropSize(sqft) {
         let prop_size;
@@ -237,60 +241,52 @@ const Home = () => {
         return prop_size;
     }
 
-
-    useEffect(() => {
-        console.log("markers effect");
-        const map = mapRef.current;
-        map && (console.log(map.getSource('parcels')))
-        //mapRef.current.getSource('parcels').setData(markers) 
-        //const source = mapRef.current.getSource('parcels');
-        //console.log(source);
+    // do things to markers later
+    // useEffect(() => {
+    //     console.log("markers effect");
+    //     const map = mapRef.current;
+    //     map && (console.log(map.getSource('parcels')))
+    //     //mapRef.current.getSource('parcels').setData(markers) 
+    //     //const source = mapRef.current.getSource('parcels');
+    //     //console.log(source);
         
-    }, [markers])
+    // }, [markers])
 
     useEffect(() => {
-        async function getMarkers() {
-            console.log('get markers')
-            let data = await fetchMarkers();
-            await setMarkers(data);
-            // mapRef.current.addSource('parcels', {
-            //     type: "geojson",
-            //     data: featureCollection(data),
-            //     cluster: true,
-            //     clusterMaxZoom: 13, // Max zoom to cluster points on
-            //     clusterRadius: 100, // Radius of each cluster when clustering points (defaults to 50)
-            //     clusterProperties: {'sum': ['+', ['get', 'subsidy']]}
-            // })
+        // async function getMarkers() {
+        //     console.log('get markers')
+        //     let data = await fetchMarkers();
+        //     await setMarkers(data);
+        //     // mapRef.current.addSource('parcels', {
+        //     //     type: "geojson",
+        //     //     data: featureCollection(data),
+        //     //     cluster: true,
+        //     //     clusterMaxZoom: 13, // Max zoom to cluster points on
+        //     //     clusterRadius: 100, // Radius of each cluster when clustering points (defaults to 50)
+        //     //     clusterProperties: {'sum': ['+', ['get', 'subsidy']]}
+        //     // })
             
-        }
-        const fetchMarkers = async () => {
-            try {
-                const response = await fetch(server + fetchString, {
-                    headers : {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
-                });
-                const data = await response.json();
-                return formatResponse(data);
-            } catch (err) {
-                console.log(err.message);
-            }
-        }
-        async function renderMap() {
+        // }
+        // const fetchMarkers = async () => {
+        //     try {
+        //         const response = await fetch(server + fetchString, {
+        //             headers : {
+        //                 'Content-Type': 'application/json',
+        //                 'Accept': 'application/json'
+        //             }
+        //         });
+        //         const data = await response.json();
+        //         return formatResponse(data);
+        //     } catch (err) {
+        //         console.log(err.message);
+        //     }
+        // }
+        function renderMap() {
             console.log('render map')
             if (mapRef.current) {
                 console.log('map already initialized')
                 return 
             }
-
-            // mapRef.current  = new mapboxgl.Map({
-            //     container: mapContainer.current,
-            //     // See style options here: https://docs.mapbox.com/api/maps/#styles
-            //     style: 'mapbox://styles/mapbox/light-v10?optimize=true',
-            //     center: [-118.2437, 34.0522],
-            //     zoom: 13,
-            // });
 
             mapRef.current = new maplibregl.Map({
                 container: mapContainer.current,
@@ -310,25 +306,15 @@ const Home = () => {
                     "url":"pmtiles://prop13.pmtiles"
                 })
                 initClusterLayers(map)
-                // setDataOrAddSourceJSON(mapRef, 'parcels');
-                // initClusterLayers(mapRef)
-                // Add a new source from our GeoJSON data and
             
             });
             map.addControl(new maplibregl.NavigationControl(), 'top-right');
-         
-  
 
             // clean up on unmount
             return () => map.remove();
         }
         
-        // This makes it feel super slow, we want map to render before fetch is done
-        // if (markers.features) {
-
-        // getMarkers();
         renderMap();
-        // }
     }, []);
 
     return (
