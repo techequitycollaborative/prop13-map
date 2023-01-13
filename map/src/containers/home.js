@@ -3,13 +3,13 @@ import "../styles/main.css"
 import "../styles/home.css"
 
 // eslint-disable-next-line import/no-webpack-loader-syntax
-// import mapboxgl from "mapbox-gl";
-import maplibre from "maplibre-gl"
+import mapboxgl from "mapbox-gl";
+// import maplibre from "maplibre-gl"
 
 const server = process.env.REACT_APP_SERVER_URL;
 const fetchString = 'server/fetchMarkers';
-// const token = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
-// mapboxgl.accessToken = token;
+const token = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
+mapboxgl.accessToken = token;
 
 
 const Home = () => {
@@ -18,6 +18,7 @@ const Home = () => {
     const mapContainer = useRef(null);
     const [markers, setMarkers] = useState([]);
 
+    // utils
     function featureCollection(data){
         return {
             "type": "FeatureCollection",
@@ -25,14 +26,15 @@ const Home = () => {
         }
     }
 
-    function setDataOrAddSource(theMap, sourceID, data, sourceOptions){
+    function setDataOrAddSourceJSON(theMap, sourceID, data, sourceOptions){
         let src = theMap.getSource(sourceID);
-        if (src){
+        if (src && data){
             src.setData(featureCollection(data))
         } else {
-            theMap.addSource({
+            theMap.addSource(sourceID, {
+
                 type: "geojson",
-                data: featureCollection(data),
+                data: featureCollection(data ? data : []),
                 ...sourceOptions
             })
         }
@@ -40,11 +42,12 @@ const Home = () => {
     }
 
     function initClusterLayers(map){
+        console.log('initClusters')
         map.addLayer({
             id: 'clusters',
             type: 'circle',
             source: 'parcels',
-            filter: ['has', 'point_count'],
+            // filter: ['has', 'point_count'],
             paint: {
                 // Use step expressions (https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions-step)
                 'circle-color': [
@@ -69,65 +72,65 @@ const Home = () => {
             }
         });
          
-        // map.addLayer({
-        //     id: 'cluster-count',
-        //     type: 'symbol',
-        //     source: 'parcels',
-        //     filter: ['has', 'point_count'],
-        //     paint: {
-        //         'text-color': '#555'
-        //     },
-        //     layout: {
-        //         // 'text-field': [
-        //         //     'number-format',
-        //         //     ['get', 'sum'],
-        //         //     {'currency': 'usd', 'max-fraction-digits': 0}
-        //         // ],
-        //         'text-field': '{point_count_abbreviated}',
-        //         'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-        //         'text-size': 12
-        //     }
-        // });
+        map.addLayer({
+            id: 'cluster-count',
+            type: 'symbol',
+            source: 'parcels',
+            filter: ['has', 'point_count'],
+            paint: {
+                'text-color': '#555'
+            },
+            layout: {
+                // 'text-field': [
+                //     'number-format',
+                //     ['get', 'sum'],
+                //     {'currency': 'usd', 'max-fraction-digits': 0}
+                // ],
+                'text-field': '{point_count_abbreviated}',
+                'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+                'text-size': 12
+            }
+        });
          
-        // map.addLayer({
-        //     id: 'unclustered-point',
-        //     type: 'circle',
-        //     source: 'parcels',
-        //     filter: ['!', ['has', 'point_count']],
-        //     paint: {
-        //         'circle-color': [
-        //             "rgb",
-        //             255,
-        //             ['-', 255, ['get', 'color']],
-        //             ['-', 255, ['get', 'color']]
-        //         ],
-        //         'circle-stroke-width': 1,
-        //         'circle-stroke-color': '#777',
-        //         'circle-radius': [
-        //             'interpolate', ['linear'], ['zoom'],
-        //             12, 2,
-        //             20, 8
-        //         ]
-        //     }
-        // });
+        map.addLayer({
+            id: 'unclustered-point',
+            type: 'circle',
+            source: 'parcels',
+            filter: ['!', ['has', 'point_count']],
+            paint: {
+                'circle-color': [
+                    "rgb",
+                    255,
+                    ['-', 255, ['get', 'color']],
+                    ['-', 255, ['get', 'color']]
+                ],
+                'circle-stroke-width': 1,
+                'circle-stroke-color': '#777',
+                'circle-radius': [
+                    'interpolate', ['linear'], ['zoom'],
+                    12, 2,
+                    20, 8
+                ]
+            }
+        });
          
-        // // inspect a cluster on click
-        // map.on('click', 'clusters', (e) => {
-        //     const features = map.queryRenderedFeatures(e.point, {
-        //         layers: ['clusters']
-        //     });
-        //     const clusterId = features[0].properties.cluster_id;
-        //     map.getSource('parcels').getClusterExpansionZoom(
-        //         clusterId,
-        //         (err, zoom) => {
-        //             if (err) return;
-        //             map.easeTo({
-        //                 center: features[0].geometry.coordinates,
-        //                 zoom: zoom+2
-        //             });
-        //         }
-        //     );
-        // });
+        // inspect a cluster on click
+        map.on('click', 'clusters', (e) => {
+            const features = map.queryRenderedFeatures(e.point, {
+                layers: ['clusters']
+            });
+            const clusterId = features[0].properties.cluster_id;
+            map.getSource('parcels').getClusterExpansionZoom(
+                clusterId,
+                (err, zoom) => {
+                    if (err) return;
+                    map.easeTo({
+                        center: features[0].geometry.coordinates,
+                        zoom: zoom+2
+                    });
+                }
+            );
+        });
          
         // // When a click event occurs on a feature in
         // // the unclustered-point layer, open a popup at
@@ -225,11 +228,31 @@ const Home = () => {
     }
 
 
+    useEffect(() => {
+        console.log("markers effect");
+        const map = mapRef.current;
+        map && (console.log(map.getSource('parcels')))
+        //mapRef.current.getSource('parcels').setData(markers) 
+        //const source = mapRef.current.getSource('parcels');
+        //console.log(source);
+        
+    }, [markers])
 
     useEffect(() => {
         async function getMarkers() {
+            console.log('get markers')
             let data = await fetchMarkers();
             await setMarkers(data);
+            mapRef.current.addSource('parcels', {
+                type: "geojson",
+                data: featureCollection(data),
+                cluster: true,
+                clusterMaxZoom: 13, // Max zoom to cluster points on
+                clusterRadius: 100, // Radius of each cluster when clustering points (defaults to 50)
+                clusterProperties: {'sum': ['+', ['get', 'subsidy']]}
+            })
+            initClusterLayers(mapRef.current)
+            
         }
         const fetchMarkers = async () => {
             try {
@@ -248,25 +271,37 @@ const Home = () => {
         async function renderMap() {
             console.log('render map')
             if (mapRef.current) {
+                console.log('map already initialized')
                 return 
             }
-            mapRef.current = new maplibre.Map({
+
+            mapRef.current  = new mapboxgl.Map({
                 container: mapContainer.current,
                 // See style options here: https://docs.mapbox.com/api/maps/#styles
-                // style: 'mapbox://styles/mapbox/light-v10?optimize=true',
-                style: 'https://demotiles.maplibre.org/style.json',
+                style: 'mapbox://styles/mapbox/light-v10?optimize=true',
                 center: [-118.2437, 34.0522],
-                zoom: 10,
+                zoom: 13,
             });
+
+            // mapRef.current = new maplibre.Map({
+            //     container: mapContainer.current,
+            //     // See style options here: https://docs.mapbox.com/api/maps/#styles
+            //     // style: 'mapbox://styles/mapbox/light-v10?optimize=true',
+            //     style: 'https://demotiles.maplibre.org/style.json',
+            //     center: [-118.2437, 34.0522],
+            //     zoom: 10,
+            // });
 
             const map = mapRef.current;
             map.on('load', () => {
                 map.resize()
+                console.log("map loaded")
+                // setDataOrAddSourceJSON(mapRef, 'parcels');
+                // initClusterLayers(mapRef)
                 // Add a new source from our GeoJSON data and
-                // set the 'cluster' option to true. GL-JS will
             
             });
-            map.addControl(new maplibre.NavigationControl(), 'top-right');
+            // map.addControl(new maplibre.NavigationControl(), 'top-right');
          
   
 
