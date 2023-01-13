@@ -129,11 +129,11 @@ const Home = () => {
             const features = map.queryRenderedFeatures(e.point, {
                 layers: ['clusters']
             });
-            const clusterId = features[0].properties.cluster_id;
             map.easeTo({
                 center: features[0].geometry.coordinates,
                 zoom: map.getZoom() + 2,
               });
+            // const clusterId = features[0].properties.cluster_id;
             // map.getSource('parcels').getClusterExpansionZoom(
             //     clusterId,
             //     (err, zoom) => {
