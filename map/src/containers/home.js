@@ -55,7 +55,7 @@ const Home = () => {
             type: 'circle',
             source: 'parcels',
             'source-layer': 'prop13',
-            // filter: ['has', 'point_count'],
+            filter: ['has', 'point_count'],
             paint: {
                 // Use step expressions (https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions-step)
                 'circle-color': [
@@ -90,13 +90,9 @@ const Home = () => {
                 'text-color': '#555'
             },
             layout: {
-                // 'text-field': [
-                //     'number-format',
-                //     ['get', 'sum'],
-                //     {'currency': 'usd', 'max-fraction-digits': 0}
-                // ],
-                'text-field': '{point_count_abbreviated}',
-                'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+                'text-field': '{point_count}',
+                'text-font': ['NotoSans-Regular'],
+                // 'text-font': ['DIN Offc Pro Medium','Open Sans Bold', 'Arial Unicode MS Bold'],
                 'text-size': 12
             }
         });
