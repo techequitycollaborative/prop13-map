@@ -2,6 +2,7 @@ import React, {useState, useRef, useEffect} from 'react'
 import "../styles/main.css"
 import "../styles/home.css"
 import * as pmtiles from "pmtiles";
+import protomaps_themes_base from "protomaps-themes-base";
 
 
 
@@ -18,6 +19,20 @@ const fetchString = 'server/fetchMarkers';
 // const token = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 // mapboxgl.accessToken = token;
 
+const PM_KEY = "c8f175d1ec9fe5a0" // only works on gh-pages, get your own at https://protomaps.com
+const VECTOR_TILES_URL = 'https://api.protomaps.com/tiles/v2/{z}/{x}/{y}.pbf?key=' + PM_KEY
+const style_json = {
+        version: 8,
+        sources: {
+            "protomaps": {
+                "type":"vector",
+                "tiles": [VECTOR_TILES_URL],
+                "maxzoom": 14
+            }
+        },
+        glyphs:'https://cdn.protomaps.com/fonts/pbf/{fontstack}/{range}.pbf',
+        layers: protomaps_themes_base("protomaps","grayscale")
+}
 
 const Home = () => {
     // reference for the map object
@@ -31,21 +46,6 @@ const Home = () => {
             "type": "FeatureCollection",
             "features": data
         }
-    }
-
-    function setDataOrAddSourceJSON(theMap, sourceID, data, sourceOptions){
-        let src = theMap.getSource(sourceID);
-        if (src && data){
-            src.setData(featureCollection(data))
-        } else {
-            theMap.addSource(sourceID, {
-
-                type: "geojson",
-                data: featureCollection(data ? data : []),
-                ...sourceOptions
-            })
-        }
-
     }
 
     function initClusterLayers(map){
@@ -292,7 +292,8 @@ const Home = () => {
                 container: mapContainer.current,
                 // See style options here: https://docs.mapbox.com/api/maps/#styles
                 // style: 'mapbox://styles/mapbox/light-v10?optimize=true',
-                style: 'https://demotiles.maplibre.org/style.json',
+                style: style_json,
+                // style: 'https://demotiles.maplibre.org/style.json',
                 center: [-118.2437, 34.0522],
                 zoom: 10,
             });
